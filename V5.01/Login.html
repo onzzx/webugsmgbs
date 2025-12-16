@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Idictive Core — Secure Access</title>
+
+<link rel="icon" type="image/png" href="https://img1.pixhost.to/images/6849/616627061_imgtmp.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+<style>
+/* ================= BOOT ROOT ================= */
+.boot-root{
+  position:fixed;
+  inset:0;
+  background:radial-gradient(circle at top,#020617,#000);
+  z-index:10000;
+  padding:20px;
+  font-family:'Orbitron',monospace;
+  color:#94a3b8;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  transition:.8s ease;
+}
+.boot-root.hide{
+  opacity:0;
+  transform:scale(1.1);
+  pointer-events:none;
+}
+.boot-title{
+  position:absolute;
+  top:16px;
+  left:20px;
+  letter-spacing:3px;
+  font-size:13px;
+  color:#00f0ff;
+}
+.boot-line{
+  font-size:12px;
+  margin-bottom:6px;
+  opacity:0;
+  transform:translateY(4px);
+  transition:.3s ease;
+}
+.boot-line.show{
+  opacity:1;
+  transform:none;
+}
+.ok{color:#22c55e}
+.warn{color:#facc15}
+
+/* ================= LOADER ================= */
+.loader-screen{
+  position:fixed;
+  inset:0;
+  background:linear-gradient(135deg,#0f172a,#1e293b);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+  transition:.8s ease;
+}
+.loader-screen.hidden{
+  opacity:0;
+  transform:scale(1.1);
+  pointer-events:none;
+}
+.spinner{
+  width:140px;
+  height:140px;
+  position:relative;
+  animation:bounceCartoon 1.2s infinite ease-in-out;
+}
+.spinner::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="%2300ffff" stroke-width="10" stroke-dasharray="150 100"><animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="2s" repeatCount="indefinite"/></circle><circle cx="50" cy="50" r="30" fill="rgba(0,255,255,0.3)"/></svg>') no-repeat center;
+  background-size:contain;
+}
+.spinner::after{
+  content:'Initializing Core…';
+  position:absolute;
+  top:110%;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:1.2rem;
+  font-family:Orbitron,sans-serif;
+  color:#00ffff;
+  text-shadow:0 0 15px rgba(0,255,255,.9);
+}
+@keyframes bounceCartoon{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-25px)}
+}
+
+/* ================= LOGIN (ASLI, TIDAK DIUBAH) ================= */
+:root{
+  --primary:#00F0FF;
+  --secondary:#FF0055;
+  --bg:#050508;
+  --border:rgba(255,255,255,.1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Rajdhani',sans-serif;
+  background:var(--bg);
+  color:#fff;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+}
+.bg-blob{
+  position:absolute;
+  width:130vw;height:130vw;
+  background:radial-gradient(circle,rgba(0,240,255,.15),rgba(255,0,85,.1),transparent 70%);
+  animation:pulse 12s infinite alternate;
+}
+@keyframes pulse{to{transform:scale(1.1)}}
+.bg-grid{
+  position:absolute;
+  inset:-50%;
+  background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:50px 50px;
+  transform:rotateX(60deg);
+}
+canvas{position:absolute;inset:0}
+.login-card{
+  display:none;
+  position:relative;
+  z-index:10;
+  width:90%;
+  max-width:420px;
+  padding:40px;
+  background:linear-gradient(180deg,rgba(20,25,35,.9),rgba(10,12,18,.95));
+  border:1px solid var(--border);
+  border-radius:22px;
+  backdrop-filter:blur(18px);
+  box-shadow:0 30px 60px rgba(0,0,0,.6);
+  animation:fadeUp .8s ease forwards;
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(30px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.logo{width:90px;height:90px;margin:0 auto 15px;position:relative}
+.logo img{width:100%;height:100%;border-radius:50%;border:2px solid rgba(255,255,255,.2)}
+.logo::after{
+  content:'';
+  position:absolute;inset:-6px;
+  border:2px dashed var(--primary);
+  border-radius:50%;
+  animation:spin 10s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+h1{
+  font-family:'Orbitron',sans-serif;
+  text-align:center;
+  letter-spacing:2px;
+  font-size:26px;
+  background:linear-gradient(to right,#fff,var(--primary));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.subtitle{text-align:center;font-size:13px;opacity:.7;margin-bottom:12px;letter-spacing:3px}
+.system-hud{display:flex;justify-content:space-between;font-size:11px;opacity:.8;margin-bottom:28px}
+.system-hud b{color:var(--primary)}
+.input-group{margin-bottom:22px}
+label{font-size:12px;letter-spacing:1px;color:var(--primary);margin-left:6px}
+.input-wrapper{position:relative}
+.input-wrapper i{position:absolute;left:18px;top:50%;transform:translateY(-50%);opacity:.6}
+input{
+  width:100%;
+  padding:15px 20px 15px 48px;
+  background:rgba(0,0,0,.45);
+  border:1px solid var(--border);
+  border-radius:12px;
+  color:#fff;
+}
+.btn-login{
+  width:100%;
+  padding:18px;
+  border:none;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  color:#fff;
+  font-family:'Orbitron',sans-serif;
+  letter-spacing:2px;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<!-- BOOT ROOT -->
+<div class="boot-root" id="bootRoot">
+  <div class="boot-title">ROOT://IDICTIVE-CORE</div>
+  <div id="bootLog"></div>
+</div>
+
+<!-- LOADER -->
+<div class="loader-screen" id="loaderScreen">
+  <div class="spinner"></div>
+</div>
+
+<!-- BACKGROUND -->
+<div class="bg-blob"></div>
+<div class="bg-grid"></div remember
+<canvas id="particleCanvas"></canvas>
+
+<!-- LOGIN -->
+<div class="login-card" id="loginCard">
+  <div class="logo">
+    <img src="https://files.catbox.moe/kzl42l.jpg">
+  </div>
+  <h1>IDICTIVE CORE</h1>
+  <div class="subtitle">SYSTEM ACCESS v5.01</div>
+  <div class="system-hud">
+    <span>CORE <b>ONLINE</b></span>
+    <span>SECURITY <b>ACTIVE</b></span>
+    <span>NODE EU-PRIME</span>
+  </div>
+  <form>
+    <div class="input-group">
+      <label>IDENTITY</label>
+      <div class="input-wrapper">
+        <input required>
+        <i class="fas fa-user-astronaut"></i>
+      </div>
+    </div>
+    <div class="input-group">
+      <label>SECURITY KEY</label>
+      <div class="input-wrapper">
+        <input type="password" required>
+        <i class="fas fa-shield-halved"></i>
+      </div>
+    </div>
+    <button class="btn-login">INITIATE CONNECTION</button>
+  </form>
+</div>
+
+<script>
+/* BOOT ROOT SEQUENCE */
+const logs=[
+  '[BOOT] Initializing kernel',
+  '[SYS] Memory check <span class="ok">OK</span>',
+  '[SEC] Firewall engaged <span class="ok">OK</span>',
+  '[NET] Secure tunnel established',
+  '[CORE] Loading interface'
+];
+const logBox=document.getElementById('bootLog');
+let i=0;
+(function boot(){
+  if(i<logs.length){
+    const d=document.createElement('div');
+    d.className='boot-line';
+    d.innerHTML=logs[i++];
+    logBox.appendChild(d);
+    setTimeout(()=>d.classList.add('show'),20);
+    setTimeout(boot,420);
+  }else{
+    setTimeout(()=>{
+      document.getElementById('bootRoot').classList.add('hide');
+    },600);
+  }
+})();
+
+/* SHOW LOGIN AFTER LOADING */
+window.addEventListener('load',()=>{
+  const loader=document.getElementById('loaderScreen');
+  const card=document.getElementById('loginCard');
+  setTimeout(()=>{
+    loader.classList.add('hidden');
+    setTimeout(()=>{card.style.display='block'},600);
+  },2500);
+});
+</script>
+
+</body>
+</html>
