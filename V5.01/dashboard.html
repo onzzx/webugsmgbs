@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NovaFlux Control Panel</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+:root{
+  --bg-main:#06070c;
+  --panel-bg:rgba(255,255,255,0.04);
+  --panel-border:rgba(255,255,255,0.12);
+  --neon-cyan:#22f7ff;
+  --neon-pink:#ff3cac;
+  --neon-lime:#3cff8f;
+  --text-main:#ffffff;
+  --text-muted:#9aa0a6;
+  --radius-xl:22px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  background:radial-gradient(circle at top,#0a0d1a,#05060b);
+  color:var(--text-main);
+  font-family:'Inter',sans-serif;
+  min-height:100vh;
+  padding-bottom:120px;
+  overflow-x:hidden;
+}
+
+h1,h2,h3{
+  font-family:'Chakra Petch',sans-serif;
+  letter-spacing:1px;
+}
+
+/* BACKGROUND FX */
+.fx-layer{position:fixed;inset:0;z-index:-1}
+.fx-orb{
+  position:absolute;width:320px;height:320px;border-radius:50%;
+  filter:blur(90px);opacity:.25;
+  animation:drift 14s ease-in-out infinite alternate
+}
+.fx-orb.cyan{background:var(--neon-cyan);top:-80px;left:-80px}
+.fx-orb.pink{background:var(--neon-pink);bottom:-120px;right:-100px;animation-delay:-6s}
+@keyframes drift{to{transform:translate(40px,30px)}}
+
+/* LAYOUT */
+.wrap{max-width:1180px;margin:auto;padding:22px}
+
+/* HEADER */
+.topbar{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:28px
+}
+.user-box{display:flex;align-items:center;gap:14px}
+.avatar-ring{
+  width:48px;height:48px;border-radius:50%;padding:2px;
+  background:linear-gradient(135deg,var(--neon-cyan),var(--neon-pink))
+}
+.avatar-ring img{
+  width:100%;height:100%;border-radius:50%;object-fit:cover;background:#000
+}
+.user-text small{color:var(--text-muted);font-size:11px}
+.user-text strong{display:block;font-size:18px}
+
+/* PANEL */
+.panel{
+  background:var(--panel-bg);
+  border:1px solid var(--panel-border);
+  border-radius:var(--radius-xl);
+  padding:22px;
+  backdrop-filter:blur(14px);
+  box-shadow:0 12px 30px rgba(0,0,0,.45)
+}
+
+/* HERO */
+.hero{margin-bottom:26px;position:relative;overflow:hidden}
+.hero::after{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,.08),transparent);
+  animation:sweep 3s infinite
+}
+@keyframes sweep{to{transform:translateX(100%)}}
+
+.hero-top{display:flex;justify-content:space-between;align-items:center}
+.sys-state{
+  font-size:11px;padding:6px 14px;border-radius:30px;
+  background:rgba(34,247,255,.15);border:1px solid var(--neon-cyan)
+}
+.version{font-size:34px;color:var(--neon-pink)}
+
+.hero-stats{
+  margin-top:18px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px
+}
+.mini-stat{
+  background:rgba(0,0,0,.35);
+  border-radius:14px;padding:12px;text-align:center
+}
+.mini-stat span{font-size:10px;color:var(--text-muted)}
+.mini-stat b{display:block;font-size:18px}
+
+/* SECTION */
+.section{margin:30px 0 16px;display:flex;align-items:center;gap:10px}
+.section i{color:var(--neon-cyan)}
+.section h3{font-size:18px}
+
+/* SYSTEM FEED */
+.news-list{
+  display:flex;gap:16px;
+  overflow-x:auto;scroll-snap-type:x mandatory
+}
+.news{
+  min-width:260px;height:160px;
+  border-radius:18px;overflow:hidden;
+  position:relative;scroll-snap-align:center;
+  text-decoration:none;color:white
+}
+.news img{
+  width:100%;height:100%;object-fit:cover;opacity:.75;transition:.4s
+}
+.news:hover img{transform:scale(1.08);opacity:.95}
+.news-info{
+  position:absolute;inset:auto 0 0 0;
+  padding:14px;
+  background:linear-gradient(to top,#000,transparent)
+}
+
+/* ACCOUNT */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.card{
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;padding:16px
+}
+.card.main{
+  grid-column:span 2;
+  background:linear-gradient(135deg,rgba(255,60,172,.15),transparent)
+}
+.card small{font-size:11px;color:var(--text-muted)}
+.card strong{display:block;font-size:22px}
+
+/* NAV */
+.dock{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%);
+  background:rgba(10,10,20,.9);
+  border:1px solid var(--panel-border);
+  border-radius:50px;
+  padding:12px 32px;
+  display:flex;gap:36px
+}
+.dock a{color:#777;font-size:18px;text-decoration:none}
+.dock a.active{color:white;text-shadow:0 0 12px var(--neon-pink)}
+</style>
+</head>
+
+<body>
+
+<div class="fx-layer">
+  <div class="fx-orb cyan"></div>
+  <div class="fx-orb pink"></div>
+</div>
+
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="topbar">
+  <div class="user-box">
+    <div class="avatar-ring">
+      <img src="https://files.catbox.moe/bjaaom.jpg">
+    </div>
+    <div class="user-text">
+      <small>ACCESS GRANTED</small>
+      <strong>NOVAFLUX</strong>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="panel hero">
+  <div class="hero-top">
+    <div class="sys-state"><i class="fa-solid fa-satellite"></i> ONLINE</div>
+    <div class="version">v6.0</div>
+  </div>
+  <div class="hero-stats">
+    <div class="mini-stat"><span>USERS</span><b>30</b></div>
+    <div class="mini-stat"><span>PING</span><b>18 ms</b></div>
+    <div class="mini-stat"><span>EXPIRE</span><b>30D</b></div>
+  </div>
+</div>
+
+<!-- SYSTEM FEED -->
+<div class="section"><i class="fa-solid fa-rss"></i><h3>System Feed</h3></div>
+<div class="news-list">
+
+  <a href="cekip.html" class="news">
+    <img src="https://files.catbox.moe/8tvcjv.jpg">
+    <div class="news-info">
+      <strong>CEK IP DOMAIN</strong><br>
+      <small>Domain Intelligence</small>
+    </div>
+  </a>
+
+  <a href="youtube.html" class="news">
+    <img src="https://files.catbox.moe/nu2azr.jpg">
+    <div class="news-info">
+      <strong>YOUTUBE</strong><br>
+      <small>Video Module</small>
+    </div>
+  </a>
+
+  <a href="tourl.html" class="news">
+    <img src="https://files.catbox.moe/288fco.jpg">
+    <div class="news-info">
+      <strong>TO URL</strong><br>
+      <small>Catbox Uploader</small>
+    </div>
+  </a>
+
+</div>
+
+<!-- ACCOUNT -->
+<div class="section"><i class="fa-solid fa-user-shield"></i><h3>Account Status</h3></div>
+<div class="grid">
+  <div class="card main"><small>Access Tier</small><strong>STANDARD</strong></div>
+  <div class="card"><small>Expired</small><strong>30 DAYS</strong></div>
+  <div class="card"><small>Protection</small><strong style="color:var(--neon-lime)">ACTIVE</strong></div>
+</div>
+
+</div>
+
+<!-- NAV -->
+<nav class="dock">
+  <a class="active"><i class="fa-solid fa-house"></i></a>
+  <a href="execution.html"><i class="fa-solid fa-bug"></i></a>
+  <a href="logout.html"><i class="fa-solid fa-right-from-bracket"></i></a>
+</nav>
+
+</body>
+</html>

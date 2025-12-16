@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Idictive Core — Domain Intelligence</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --primary:#00F0FF;
+  --secondary:#FF0055;
+  --bg:#050508;
+  --glass:rgba(20,25,35,.85);
+  --border:rgba(255,255,255,.12);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  font-family:'Rajdhani',sans-serif;
+  background:var(--bg);
+  color:#fff;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+}
+
+/* BG */
+.bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 30% 20%,rgba(0,240,255,.12),transparent 60%),
+    radial-gradient(circle at 70% 80%,rgba(255,0,85,.12),transparent 60%);
+}
+
+/* CARD */
+.card{
+  position:relative;
+  z-index:5;
+  width:90%;
+  max-width:520px;
+  padding:38px;
+  background:linear-gradient(180deg,rgba(20,25,35,.9),rgba(10,12,18,.95));
+  border:1px solid var(--border);
+  border-radius:22px;
+  backdrop-filter:blur(18px);
+  box-shadow:0 30px 70px rgba(0,0,0,.7);
+}
+
+.card::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--primary),var(--secondary),transparent);
+  animation:shine 3s linear infinite;
+}
+@keyframes shine{
+  from{background-position:-200%}
+  to{background-position:200%}
+}
+
+/* TITLE */
+h1{
+  font-family:'Orbitron',sans-serif;
+  font-size:24px;
+  text-align:center;
+  letter-spacing:2px;
+  background:linear-gradient(to right,#fff,var(--primary));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.subtitle{
+  text-align:center;
+  font-size:12px;
+  letter-spacing:3px;
+  opacity:.7;
+  margin:8px 0 28px;
+}
+
+/* INPUT */
+label{
+  font-size:12px;
+  letter-spacing:1px;
+  color:var(--primary);
+  margin-left:6px;
+}
+input{
+  width:100%;
+  margin-top:6px;
+  padding:15px 18px;
+  background:rgba(0,0,0,.45);
+  border:1px solid var(--border);
+  border-radius:14px;
+  color:#fff;
+  outline:none;
+  font-size:16px;
+}
+input:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 18px rgba(0,240,255,.2);
+}
+
+/* BUTTON */
+.btn{
+  width:100%;
+  margin-top:20px;
+  padding:16px;
+  border:none;
+  border-radius:14px;
+  font-family:'Orbitron',sans-serif;
+  letter-spacing:2px;
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  color:#fff;
+  cursor:not-allowed;
+  opacity:.5;
+  transition:.3s;
+}
+.btn.active{
+  opacity:1;
+  cursor:pointer;
+}
+.btn.active:hover{
+  transform:translateY(-2px);
+}
+
+/* RESULT */
+.result{
+  margin-top:26px;
+  padding:18px;
+  background:rgba(0,0,0,.55);
+  border:1px dashed var(--border);
+  border-radius:14px;
+  font-size:14px;
+  line-height:1.7;
+  white-space:pre-line;
+  display:none;
+}
+
+/* FOOTER */
+.footer{
+  margin-top:18px;
+  text-align:center;
+  font-size:12px;
+  opacity:.6;
+}
+.footer span{color:var(--primary)}
+
+@media(max-width:480px){
+  .card{padding:28px 20px}
+  h1{font-size:20px}
+}
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<div class="card">
+  <h1>DOMAIN INTELLIGENCE</h1>
+  <div class="subtitle">SYSTEM RESOLVE MODULE</div>
+
+  <label>DOMAIN / URL</label>
+  <input id="domainInput" placeholder="example.com / https://site.com">
+
+  <button id="checkBtn" class="btn">CEK IP DOMAIN</button>
+
+  <div id="resultBox" class="result"></div>
+
+  <div class="footer">
+    Idictive Core <span>v0.2</span>
+  </div>
+</div>
+
+<script>
+const input=document.getElementById('domainInput');
+const btn=document.getElementById('checkBtn');
+const result=document.getElementById('resultBox');
+
+input.addEventListener('input',()=>{
+  if(input.value.trim()){
+    btn.classList.add('active');
+  }else{
+    btn.classList.remove('active');
+  }
+});
+
+btn.onclick=async()=>{
+  if(!btn.classList.contains('active'))return;
+
+  result.style.display='block';
+  result.textContent='SCANNING DOMAIN...';
+
+  const domain=extractDomain(input.value);
+
+  if(!validDomain(domain)){
+    result.textContent='STATUS : INVALID DOMAIN FORMAT';
+    return;
+  }
+
+  try{
+    const dns=await fetch(`https://dns.google/resolve?name=${domain}&type=A`)
+      .then(r=>r.json());
+
+    if(!dns.Answer)throw 0;
+
+    const ip=dns.Answer[0].data;
+
+    const ipInfo=await fetch(`https://ipwho.is/${ip}`).then(r=>r.json());
+    if(!ipInfo.success)throw 0;
+
+    const type=detectServerType(ipInfo.org||ipInfo.isp||'');
+
+    result.textContent=
+`DOMAIN   : ${domain}
+IP       : ${ip}
+COUNTRY  : ${ipInfo.country}
+ORG      : ${ipInfo.org || ipInfo.isp}
+TYPE     : ${type}
+STATUS   : RESOLVED`;
+  }catch{
+    result.textContent=
+`DOMAIN : ${domain}
+STATUS : FAILED / NOT FOUND`;
+  }
+};
+
+function extractDomain(v){
+  v=v.trim();
+  v=v.replace(/^https?:\/\//,'');
+  v=v.split('/')[0];
+  v=v.replace(/^www\./,'');
+  return v;
+}
+
+function validDomain(d){
+  return /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(d);
+}
+
+function detectServerType(org){
+  const o=org.toLowerCase();
+  if(o.includes('cloudflare')||o.includes('akamai')||o.includes('fastly'))
+    return 'CDN / PROXY';
+  if(
+    o.includes('cloud')||
+    o.includes('hosting')||
+    o.includes('digitalocean')||
+    o.includes('vultr')||
+    o.includes('ovh')||
+    o.includes('linode')||
+    o.includes('amazon')||
+    o.includes('aws')||
+    o.includes('google')||
+    o.includes('azure')
+  ) return 'VPS / CLOUD';
+  return 'ISP / RESIDENTIAL';
+}
+</script>
+
+</body>
+</html>

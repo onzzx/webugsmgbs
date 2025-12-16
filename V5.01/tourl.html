@@ -1,0 +1,81 @@
+<!DOCTYPE html><html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Idictive Core — ToURL Catbox</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#00F0FF;--secondary:#FF0055;--bg:#050508;--border:rgba(255,255,255,.12)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:#fff;min-height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden}
+.bg{position:absolute;inset:0;background:radial-gradient(circle at 30% 20%,rgba(0,240,255,.12),transparent 60%),radial-gradient(circle at 70% 80%,rgba(255,0,85,.12),transparent 60%)}
+.card{position:relative;z-index:5;width:90%;max-width:520px;padding:38px;background:linear-gradient(180deg,rgba(20,25,35,.9),rgba(10,12,18,.95));border:1px solid var(--border);border-radius:22px;backdrop-filter:blur(18px);box-shadow:0 30px 70px rgba(0,0,0,.7)}
+h1{font-family:'Orbitron',sans-serif;font-size:24px;text-align:center;letter-spacing:2px;background:linear-gradient(to right,#fff,var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{text-align:center;font-size:12px;letter-spacing:3px;opacity:.7;margin:8px 0 28px}
+input[type=file]{width:100%;padding:14px;background:rgba(0,0,0,.45);border:1px dashed var(--border);border-radius:14px;color:#aaa}
+.btn{width:100%;margin-top:18px;padding:16px;border:none;border-radius:14px;font-family:'Orbitron',sans-serif;letter-spacing:2px;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;cursor:not-allowed;opacity:.5;transition:.3s}
+.btn.active{cursor:pointer;opacity:1}
+.btn.active:hover{transform:translateY(-2px)}
+.preview{margin-top:18px;display:none;border-radius:14px;overflow:hidden;border:1px solid var(--border)}
+.preview img,.preview video{width:100%;display:block}
+.result{margin-top:18px;padding:16px;background:rgba(0,0,0,.55);border:1px dashed var(--border);border-radius:14px;font-size:14px;word-break:break-all;display:none}
+.footer{margin-top:18px;text-align:center;font-size:12px;opacity:.6}
+.footer span{color:var(--primary)}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="card">
+<h1>TO URL</h1>
+<div class="subtitle">CATBOX UPLOADER</div>
+<input id="fileInput" type="file" accept="image/*,video/*">
+<button id="uploadBtn" class="btn">UPLOAD & GET URL</button>
+<div id="preview" class="preview"></div>
+<div id="result" class="result"></div>
+<div class="footer">Idictive Core <span>v1.0</span></div>
+</div>
+<script>
+const fileInput=document.getElementById('fileInput');
+const btn=document.getElementById('uploadBtn');
+const preview=document.getElementById('preview');
+const result=document.getElementById('result');
+fileInput.addEventListener('change',()=>{
+ if(fileInput.files.length){
+   btn.classList.add('active');
+   showPreview(fileInput.files[0]);
+ }
+});
+btn.onclick=async()=>{
+ if(!btn.classList.contains('active'))return;
+ const file=fileInput.files[0];
+ result.style.display='block';
+ result.textContent='UPLOADING TO CATBOX...';
+ const form=new FormData();
+ form.append('reqtype','fileupload');
+ form.append('fileToUpload',file);
+ try{
+   const res=await fetch('https://catbox.moe/user/api.php',{method:'POST',body:form});
+   const text=await res.text();
+   if(!text.startsWith('https://'))throw 0;
+   result.textContent=`URL: ${text}`;
+ }catch{
+   result.textContent='UPLOAD FAILED';
+ }
+};
+function showPreview(file){
+ preview.style.display='block';
+ preview.innerHTML='';
+ if(file.type.startsWith('image')){
+   const img=document.createElement('img');
+   img.src=URL.createObjectURL(file);
+   preview.appendChild(img);
+ }else if(file.type.startsWith('video')){
+   const vid=document.createElement('video');
+   vid.src=URL.createObjectURL(file);
+   vid.controls=true;
+   preview.appendChild(vid);
+ }
+}
+</script>
+</body>
+</html>
